@@ -3,7 +3,7 @@ package common
 import "time"
 
 type TinyURL struct {
-	OriginalURL string
-	ShortCode   string
-	GeneratedAt time.Time
+	OriginalURL  string
+	GeneratedURL string
+	GeneratedAt  time.Time
 }

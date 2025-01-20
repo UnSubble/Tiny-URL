@@ -1,7 +1,7 @@
 package common
 
 type DriverConfig struct {
-	DriverName            string `json:"driver-name"`
+	DriverName            string
 	DbName                string `json:"db-uri"`
 	MaxConnections        int    `json:"max-conn"`
 	MaxConnectionIdleTime int    `json:"conn-idle-time"`

@@ -1,10 +1,9 @@
 {
-    "url": "unsubble.com",
+    "domain": "unsubble.com",
     "base-format": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "databases": [
         {
-            "driver-name": "sqlite3",
-            "db-uri": "file:./database.db",
+            "db-uri": "file:database.db",
             "max-conn": 10,
             "conn-idle-time": 3
         }
