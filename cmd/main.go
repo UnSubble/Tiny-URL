@@ -17,7 +17,7 @@ func main() {
 
 	cfg := config.ReadConfig(CONFIG_PATH)
 
-	repo, err := database.NewSqliteRepository(cfg.DriverConfig[0])
+	repo, err := database.NewPostgresRepository(cfg.DriverConfig[1])
 
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -30,5 +30,5 @@ func main() {
 		log.Fatalf("%v", err)
 	}
 
-	fmt.Println("url: ", url)
+	fmt.Println("url:", url)
 }

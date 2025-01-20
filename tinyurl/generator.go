@@ -100,7 +100,9 @@ func (gen *Generator) GenerateURL(targetUrl string) (*TinyURL, error) {
 		GeneratedAt:  time.Now(),
 	}
 
-	gen.driver.AddUrl((*database.TinyURL)(tinyUrl))
+	if err = gen.driver.AddUrl((*database.TinyURL)(tinyUrl)); err != nil {
+		return nil, err
+	}
 
 	return tinyUrl, nil
 }

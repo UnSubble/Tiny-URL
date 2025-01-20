@@ -5,19 +5,19 @@ import (
 	"fmt"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 	"github.com/unsubble/tiny-url/common"
 )
 
-type SqliteRepository struct {
+type PostgresRepository struct {
 	pool      *sql.DB
 	driverCfg *common.DriverConfig
 }
 
-func (repo *SqliteRepository) CreateTableIfNotExists(name string) error {
+func (repo *PostgresRepository) CreateTableIfNotExists(name string) error {
 	query := fmt.Sprintf(`
 		CREATE TABLE IF NOT EXISTS %s (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			id SERIAL PRIMARY KEY,
 			original_url TEXT NOT NULL,
 			generated_url TEXT NOT NULL UNIQUE,
 			generated_at BIGINT NOT NULL
@@ -32,13 +32,14 @@ func (repo *SqliteRepository) CreateTableIfNotExists(name string) error {
 	return nil
 }
 
-func (repo *SqliteRepository) AddUrl(tinyurl *TinyURL) error {
+func (repo *PostgresRepository) AddUrl(tinyurl *TinyURL) error {
 	query := `
 		INSERT INTO urls (original_url, generated_url, generated_at)
-		VALUES (?, ?, ?);
+		VALUES ($1, $2, $3);
 	`
 
 	_, err := repo.pool.Exec(query, tinyurl.OriginalURL, tinyurl.GeneratedURL, tinyurl.GeneratedAt.UnixMilli())
+
 	if err != nil {
 		return fmt.Errorf("failed to add URL: %w", err)
 	}
@@ -46,21 +47,18 @@ func (repo *SqliteRepository) AddUrl(tinyurl *TinyURL) error {
 	return nil
 }
 
-func (repo *SqliteRepository) GetPool() *sql.DB {
+func (repo *PostgresRepository) GetPool() *sql.DB {
 	return repo.pool
 }
 
-func (repo *SqliteRepository) GetInfo() *common.DriverConfig {
+func (repo *PostgresRepository) GetInfo() *common.DriverConfig {
 	return repo.driverCfg
 }
 
-func NewSqliteRepository(driverCfg *common.DriverConfig) (*SqliteRepository, error) {
-	driverCfg.DriverName = "sqlite3"
-	connStr := driverCfg.DbURI
-
-	if driverCfg.DbURI == "" {
-		return nil, fmt.Errorf("database URI is required")
-	}
+func NewPostgresRepository(driverCfg *common.DriverConfig) (*PostgresRepository, error) {
+	driverCfg.DriverName = "postgres"
+	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s",
+		driverCfg.Username, driverCfg.Password, driverCfg.DbURI, driverCfg.DbName)
 
 	db, err := sql.Open(driverCfg.DriverName, connStr)
 	if err != nil {
@@ -74,7 +72,7 @@ func NewSqliteRepository(driverCfg *common.DriverConfig) (*SqliteRepository, err
 	db.SetMaxOpenConns(driverCfg.MaxConnections)
 	db.SetConnMaxIdleTime(time.Duration(driverCfg.ConnectionIdleTime))
 
-	repo := &SqliteRepository{
+	repo := &PostgresRepository{
 		pool:      db,
 		driverCfg: driverCfg,
 	}

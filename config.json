@@ -3,6 +3,8 @@
     "base-format": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
     "databases": [
         {
+            "driver": "sqlite3",
+            "db-name": "database.db",
             "db-uri": "file:database.db",
             "max-conn": 10,
             "conn-idle-time": 3
