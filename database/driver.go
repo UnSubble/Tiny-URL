@@ -13,4 +13,5 @@ type Driver interface {
 	AddUrl(*TinyURL) error
 	GetPool() *sql.DB
 	GetInfo() *common.DriverConfig
+	GetOriginalUrl(string) (string, error)
 }

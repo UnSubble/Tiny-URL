@@ -47,6 +47,24 @@ func (repo *PostgresRepository) AddUrl(tinyurl *TinyURL) error {
 	return nil
 }
 
+func (repo *PostgresRepository) GetOriginalUrl(tiny string) (string, error) {
+	query := `
+		SELECT original_url FROM urls
+		WHERE generated_url = $1;
+	`
+
+	var originalUrl string
+	err := repo.pool.QueryRow(query, tiny).Scan(&originalUrl)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("there is no such URL: %s", tiny)
+		}
+		return "", fmt.Errorf("failed to fetch URL: %w", err)
+	}
+
+	return originalUrl, nil
+}
+
 func (repo *PostgresRepository) GetPool() *sql.DB {
 	return repo.pool
 }

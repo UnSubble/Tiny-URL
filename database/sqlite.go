@@ -46,6 +46,24 @@ func (repo *SqliteRepository) AddUrl(tinyurl *TinyURL) error {
 	return nil
 }
 
+func (repo *SqliteRepository) GetOriginalUrl(tiny string) (string, error) {
+	query := `
+		SELECT original_url FROM urls
+		WHERE generated_url = ?;
+	`
+
+	var originalUrl string
+	err := repo.pool.QueryRow(query, tiny).Scan(&originalUrl)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("there is no such URL: %s", tiny)
+		}
+		return "", fmt.Errorf("failed to fetch URL: %w", err)
+	}
+
+	return originalUrl, nil
+}
+
 func (repo *SqliteRepository) GetPool() *sql.DB {
 	return repo.pool
 }
