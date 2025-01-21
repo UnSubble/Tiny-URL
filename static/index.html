@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TinyURL</title>
+    <link rel="stylesheet" href="/static/resource/style.css" />
+</head>
+<body>
+    <h1>TinyURL</h1>
+    <div>
+        <h2>Shorten URL</h2>
+        <form id="shorten-form">
+            <input type="text" id="url-input" placeholder="Enter URL" required>
+            <button type="submit">Shorten</button>
+        </form>
+        <p id="shorten-result"></p>
+    </div>
+    <div>
+        <h2>Fetch Original URL</h2>
+        <form id="fetch-form">
+            <input type="text" id="short-url-input" placeholder="Enter Short URL" required>
+            <button type="submit">Fetch</button>
+        </form>
+        <p id="fetch-result"></p>
+    </div>
+
+    <script>
+        document.getElementById("shorten-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const url = document.getElementById("url-input").value;
+
+            const response = await fetch("/shorten", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ url }),
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById("shorten-result").textContent = `Shortened URL: ${data.short_url}`;
+            } else {
+                document.getElementById("shorten-result").textContent = `Error: ${data.message || "Something went wrong"}`;
+            }
+        });
+
+        document.getElementById("fetch-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const shortURL = document.getElementById("short-url-input").value;
+
+            const response = await fetch(`/fetch?short_url=${encodeURIComponent(shortURL)}`);
+            const data = await response.json();
+
+            if (response.ok) {
+                document.getElementById("fetch-result").textContent = `Original URL: ${data.original_url}`;
+            } else {
+                document.getElementById("fetch-result").textContent = `Error: ${data.message || "Short URL not found"}`;
+            }
+        });
+    </script>
+</body>
+</html>

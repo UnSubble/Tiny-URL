@@ -1,7 +1,7 @@
 {
     "domain": "unsubble.com",
     "base-format": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-    "databases": [
+    "database": 
         {
             "driver": "sqlite3",
             "db-name": "database.db",
@@ -9,6 +9,6 @@
             "max-conn": 10,
             "conn-idle-time": 3
         }
-    ],
+    ,
     "epoch-time": 1577836800000
 }
